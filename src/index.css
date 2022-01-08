@@ -1,0 +1,83 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: none;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  display: flex;
+  max-width: 2000px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  height: 100%;
+  gap: 10px;
+}
+
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+}
+
+.leftSection {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  height: 100%;
+}
+
+.my-video {
+  width: 100%;
+  height: 600px;
+  background: black;
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btnNext {
+  background: green;
+  width: 124px;
+  height: 64px;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+.btnStop {
+  background: red;
+  width: 124px;
+  height: 64px;
+  color: white;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+video {
+  background: #222;
+  --width: 100%;
+  width: var(--width);
+  height: calc(var(--width) * 0.75);
+}
