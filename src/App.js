@@ -4,22 +4,22 @@ function App() {
   const myVideo = useRef();
 
   useEffect(() => {
-    console.log("a");
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true})
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then(stream => {
-      console.log(myVideo, stream);
       myVideo.current.srcObject = stream;
+      myVideo.current.play();
     })
     .catch(error => {
       console.log(error);
     })
-  }, [myVideo])
+
+  }, [])
 
   return (
     <div className="container">
       <div className="leftSection">
         <div className="my-video">
-          <video autoPlay ref={myVideo}></video>
+          <video ref={myVideo} />
         </div>
         <div className="buttons">
           <button className="btnNext">Next</button>
