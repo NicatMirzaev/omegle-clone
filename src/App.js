@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+import Peer from 'peerjs';
 
 let socket = null;
+let peer = null;
+let currentCall = null;
 
 function Loading() {
   return (
@@ -24,7 +27,7 @@ function App() {
   const remoteVideo = useRef()
   const [started, setStarted] = useState(null);
   const [peerId, setPeerId] = useState(null);
-  const [remotePeerId, setRemotePeerId] = useState(null);
+  const [isTalking, setIsTalking] = useState(false);
   const [permission, setPermission] = useState(false);
 
   useEffect(() => {
@@ -38,11 +41,42 @@ function App() {
       socket.on("new-user", ({ peer_id, remote_peer_id }) => {
         setStarted(true);
         setPeerId(peer_id);
-        setRemotePeerId(remote_peer_id);
+
+        peer = new Peer(peer_id, { debug: 3 });
+
+        peer.on("open", id => {
+          if(remote_peer_id != null) {
+            callPeer(stream, remote_peer_id)
+          }
+        })
+
+
+        peer.on("call", function(call) {
+          call.answer(stream);
+          console.log("call received");
+          call.on('stream', function(remoteStream) {
+            remoteVideo.current.srcObject = remoteStream;
+            remoteVideo.current.play();
+          });
+
+          setIsTalking(true);
+
+          currentCall = call 
+        });
+
       })
-      socket.on("peer-found", ({ id }) => {
-        setRemotePeerId(id);
+      socket.on("peer-disconnected", ({ new_remote_peer_id }) => {
+        currentCall?.close();
+        remoteVideo.current.pause();
+        remoteVideo.current.removeAttribute('src'); // empty source
+        remoteVideo.current.load();
+        setIsTalking(false);
+
+        if(new_remote_peer_id !== null) {
+          callPeer(stream, new_remote_peer_id);
+        }
       })
+
     })
     .catch(error => {
       console.log(error);
@@ -61,6 +95,15 @@ function App() {
     }
   }
 
+  const callPeer = (stream, peer_id) => {
+    var call = peer.call(peer_id, stream);
+    call.on('stream', remoteStream => { 
+      remoteVideo.current.srcObject = remoteStream;
+      remoteVideo.current.play();
+      setIsTalking(true);
+    });
+  }
+
   return (
     <div className="container">
       <div className="leftSection">
@@ -76,7 +119,7 @@ function App() {
       <div className="rightSection">
         <div className="video">
           <video ref={remoteVideo} />
-          {started && remotePeerId === null ? <Loading/> : null}
+          {started === true && isTalking === false ? <Loading/> : null}
         </div>
       </div>
     </div>
