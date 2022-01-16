@@ -77,6 +77,13 @@ function App() {
         }
       })
 
+      socket.on("new-peer", ({ new_remote_peer_id }) => {
+        setStarted(true);
+        if(new_remote_peer_id !== null) {
+          callPeer(stream, new_remote_peer_id);
+        }
+      })
+
     })
     .catch(error => {
       console.log(error);
@@ -90,9 +97,23 @@ function App() {
   const onClickStart = () => {
     if(!permission) return;
 
-    if(!started) {
+    if(!started && peerId === null) {
       socket.emit("new-user");
     }
+    else if(!started && peerId !== null) {
+      socket.emit("start");
+    }
+  }
+
+  const onClickStop = () => {
+    if(!started) return;
+    currentCall?.close();
+    remoteVideo.current.pause();
+    remoteVideo.current.removeAttribute('src'); // empty source
+    remoteVideo.current.load();
+    setIsTalking(false);
+    setStarted(false);
+    socket.emit("stop");
   }
 
   const callPeer = (stream, peer_id) => {
@@ -113,7 +134,7 @@ function App() {
         </div>
         <div className="buttons">
           <button onClick={onClickStart} className="btnNext">{!started ? "Start" : "Next"}</button>
-          <button disabled={started} className="btnStop">Stop</button>
+          <button onClick={onClickStop} disabled={!started} className="btnStop">Stop</button>
         </div>
       </div>
       <div className="rightSection">

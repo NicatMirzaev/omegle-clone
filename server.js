@@ -30,6 +30,47 @@ io.on("connection", socket => {
 
     console.log(`A user connected (peer id: ${generatedUUID}`);
   })
+
+  socket.on("stop", () => {
+    let remote_peer_id = null;
+    for(let i = 0; i < users.length; i++) {
+      const socket_id = users[i].socket_id;
+      if(socket_id === socket.id) {
+        users[i].started = false;
+        remote_peer_id = users[i].remote_peer_id;
+        users[i].remote_peer_id = null;
+        break;
+      }
+    }
+
+    if(remote_peer_id !== null) {
+      for(let i = 0; i < users.length; i++) {
+        const { peer_id, socket_id } = users[i];
+        if(peer_id === remote_peer_id) {
+          const new_remote_peer_id = searchForPeer(peer_id);
+          users[i].started = true;
+          users[i].remote_peer_id = new_remote_peer_id;
+          io.to(socket_id).emit("peer-disconnected", { new_remote_peer_id });
+        }
+      }
+    }
+  })
+  
+  
+
+  socket.on("start", () => {
+    for(let i = 0; i < users.length; i++) {
+      const { peer_id, socket_id} = users[i];
+      if(socket_id === socket.id) {
+        const new_remote_peer_id = searchForPeer(peer_id);
+        users[i].started = true;
+        users[i].remote_peer_id = new_remote_peer_id;
+        io.to(socket_id).emit("new-peer", { new_remote_peer_id });
+        break;
+      }
+    }
+  })
+
   socket.on("disconnect", () => {
     let remote_peer_id = null;
     users = users.filter(user => {
@@ -47,15 +88,12 @@ io.on("connection", socket => {
 })
 
 function onPeerDisconnect(user_peer_id) {
-  console.log(user_peer_id);
   const index = users.findIndex(user => user.peer_id === user_peer_id);
-  console.log(index);
   if(index !== -1) {
     const { peer_id, socket_id } = users[index];
     const new_remote_peer_id = searchForPeer(peer_id);
     users[index].remote_peer_id = new_remote_peer_id;
     io.to(socket_id).emit("peer-disconnected", { new_remote_peer_id });
-    console.log(users);
   }
 }
 
