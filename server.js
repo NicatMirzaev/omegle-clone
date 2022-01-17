@@ -71,6 +71,33 @@ io.on("connection", socket => {
     }
   })
 
+  socket.on("next", () => {
+    let remote_peer_id = null;
+    for(let i = 0; i < users.length; i++) {
+      const { peer_id, socket_id} = users[i];
+      if(socket_id === socket.id) {
+        const new_remote_peer_id = searchForPeer(peer_id);
+        users[i].started = true;
+        remote_peer_id = users[i].remote_peer_id;
+        users[i].remote_peer_id = new_remote_peer_id;
+        io.to(socket_id).emit("new-peer", { new_remote_peer_id });
+        break;
+      }
+    }
+    if(remote_peer_id !== null) {
+      for(let i = 0; i < users.length; i++) {
+        const { peer_id, socket_id} = users[i];
+        if(peer_id === remote_peer_id) {
+          const new_remote_peer_id = searchForPeer(peer_id);
+          users[i].started = true;
+          users[i].remote_peer_id = new_remote_peer_id;
+          io.to(socket_id).emit("peer-disconnected", { new_remote_peer_id });
+          break;
+        }
+      }
+    }
+  })
+
   socket.on("disconnect", () => {
     let remote_peer_id = null;
     users = users.filter(user => {

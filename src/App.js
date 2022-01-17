@@ -103,13 +103,21 @@ function App() {
     else if(!started && peerId !== null) {
       socket.emit("start");
     }
+    else if(started && peerId !== null) {
+      currentCall?.close();
+      remoteVideo.current.pause();
+      remoteVideo.current.removeAttribute('src');
+      remoteVideo.current.load();
+      setIsTalking(false);
+      socket.emit("next");
+    }
   }
 
   const onClickStop = () => {
     if(!started) return;
     currentCall?.close();
     remoteVideo.current.pause();
-    remoteVideo.current.removeAttribute('src'); // empty source
+    remoteVideo.current.removeAttribute('src');
     remoteVideo.current.load();
     setIsTalking(false);
     setStarted(false);
