@@ -34,6 +34,8 @@ function App() {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
     .then(stream => {
       myVideo.current.srcObject = stream;
+      myVideo.current.volume = 0;
+      myVideo.current.muted = true;
       myVideo.current.play();
 
       setPermission(true);
@@ -136,7 +138,7 @@ function App() {
     <div className="container">
       <div className="leftSection">
         <div className="video">
-          <video ref={myVideo} />
+          <video muted ref={myVideo} />
           {!started && <span style={{textAlign: "center", color: "white"}}>To get started, please allow camera and microphone access. Then click to start button.</span>}
         </div>
         <div className="buttons">
