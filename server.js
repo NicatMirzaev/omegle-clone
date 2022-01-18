@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 const server = require('http').Server(app);
 const io = require("socket.io")(server);
@@ -7,9 +8,9 @@ const port = process.env.PORT || 5000;
 
 let users = [];
 
-app.get('/health', (req, res) => {
-  res.send(users);
-});
+app.use(express.static(path.resolve(__dirname, './build')));
+app.use(express.static("public"));
+
 
 io.on("connection", socket => {
   socket.on("new-user", () => {
