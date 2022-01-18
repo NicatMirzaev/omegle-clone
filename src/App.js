@@ -42,7 +42,7 @@ function App() {
         setStarted(true);
         setPeerId(peer_id);
 
-        peer = new Peer(peer_id, { debug: 3 });
+        peer = new Peer(peer_id);
 
         peer.on("open", id => {
           if(remote_peer_id != null) {
