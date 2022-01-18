@@ -53,7 +53,6 @@ function App() {
 
         peer.on("call", function(call) {
           call.answer(stream);
-          console.log("call received");
           call.on('stream', function(remoteStream) {
             remoteVideo.current.srcObject = remoteStream;
             remoteVideo.current.play();
