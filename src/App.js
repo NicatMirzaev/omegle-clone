@@ -31,7 +31,7 @@ function App() {
   const [permission, setPermission] = useState(false);
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    navigator.mediaDevices.getUserMedia({ video: true, audio: { echoCancellation: true, noiseSuppression: true } })
     .then(stream => {
       myVideo.current.srcObject = stream;
       myVideo.current.volume = 0;
